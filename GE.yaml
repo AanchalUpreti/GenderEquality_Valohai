@@ -3,11 +3,15 @@
     name: preprocess-dataset
     image: python:3.9
     command:
-      - pip install numpy valohai-utils
-      - python ./preprocess_dataset.py
+      - !pip install NRCLex
+      - !pip install torch
+      - !pip install stanza
+      - python ./GE_final_ai_models.py
     inputs:
       - name: dataset
-        default: https://valohaidemo.blob.core.windows.net/mnist/mnist.npz
+        default: https://raw.githubusercontent.com/AanchalUpreti/GenderEquality_Valohai/main/HP_db.csv
+      - name: dataset
+        default: https://raw.githubusercontent.com/AanchalUpreti/GenderEquality_Valohai/main/harry_stanza_annotated.csv 
 
 
 - pipeline:
@@ -28,57 +32,6 @@
     edges:
       - [preprocess.output.preprocessed_mnist.npz, train.input.dataset]
       - [train.output.model*, evaluate.input.model]
-
-- pipeline:
-    name: Three-Trainings Pipeline
-    nodes:
-      - name: preprocess
-        type: execution
-        step: preprocess-dataset
-      - name: train1
-        type: execution
-        step: train-model
-        override:
-          inputs:
-            - name: dataset
-      - name: find-best-model
-        type: execution
-        step: compare-predictions
-    edges:
-      - [preprocess.output.preprocessed_mnist.npz, train1.input.dataset]
-      - [preprocess.output.preprocessed_mnist.npz, train2.input.dataset]
-      - [preprocess.output.preprocessed_mnist.npz, train3.input.dataset]
-      - [train1.output.model*, evaluate1.input.model]
-      - [train2.output.model*, evaluate2.input.model]
-      - [train3.output.model*, evaluate3.input.model]
-      - [evaluate1.output.*.json, find-best-model.input.predictions]
-      - [evaluate2.output.*.json, find-best-model.input.predictions]
-      - [evaluate3.output.*.json, find-best-model.input.predictions]
-      - [evaluate1.input.model, find-best-model.input.models]
-      - [evaluate2.input.model*, find-best-model.input.models]
-      - [evaluate3.input.model*, find-best-model.input.models]
-
-- pipeline:
-    name: Three-Trainings Pipeline with deployment
-    nodes:
-      - name: preprocess
-        type: execution
-        step: preprocess-dataset
-      - name: train1
-        type: execution
-        step: train-model
-        override:
-          inputs:
-            - name: dataset
-      - name: deploy
-        type: deployment
-        deployment: deployment-test
-        endpoints:
-          - predict-digit
-    edges:
-      - [preprocess.output.preprocessed_mnist.npz, train1.input.dataset]
-      - [preprocess.output.preprocessed_mnist.npz, train2.input.dataset]
-      - [preprocess.output.preprocessed_mnist.npz, train3.input.dataset]
 
 
 - endpoint:
