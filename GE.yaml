@@ -38,11 +38,8 @@
 
 
 - endpoint:
-    name: predict-digit
-    description: predict digits from image inputs ("file" parameter)
-    image: tensorflow/tensorflow:2.6.0
-    wsgi: predict:predict
+    name: pre-process
     files:
-      - name: model
-        description: Model output file from TensorFlow
+      - name: pre-process
+        description: output file 
         path: model.h5
