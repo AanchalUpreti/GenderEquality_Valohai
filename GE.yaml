@@ -3,9 +3,12 @@
     name: preprocess-dataset
     image: python:3.9
     command:
-      - !pip install NRCLex
-      - !pip install torch
-      - !pip install stanza
+      - !pip install nltk
+      - !pip install textblob
+      - !pip install json
+      - !pip install numpy
+      - !pip install regex
+      - !pip install pandas
       - python ./GE_final_ai_models.py
     inputs:
       - name: dataset
